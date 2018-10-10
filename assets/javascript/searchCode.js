@@ -1,9 +1,21 @@
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyCgdC3L7ERDDqFWDQs1HOKGajC97eStPDo",
+  authDomain: "musicmaps-80439.firebaseapp.com",
+  databaseURL: "https://musicmaps-80439.firebaseio.com",
+  projectId: "musicmaps-80439",
+  storageBucket: "musicmaps-80439.appspot.com",
+  messagingSenderId: "185807662566"
+};
+firebase.initializeApp(config);
+$(".music").hide();
+
 var map;
 var markers = []; //store the location markers we add tinyurl.com/gmproj5
 var directionsDisplay;
 var directionsService;
 
-var start; //start place
+var start ; //start place
 var end; //end place
 var wayPoint = []; //array for holding places objects of each travel point. [0] = start, [1] = end, others = waypoints
 
@@ -13,7 +25,6 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 37.09024, lng: -100.712891}, //initially centered in the middle of the US, quickly replaced with current location
         zoom: 4
-//        mapTypeId: google.maps.MapTypeId.ROADMAP
     });
     
     
@@ -39,18 +50,15 @@ function initMap() {
     
     // Create the searchBoxes and link them to the UI element. from: tinyurl.com/gmproj1
     var searchBox0 = new google.maps.places.SearchBox(document.getElementById('loc1'));
-    var searchBox1 = new google.maps.places.SearchBox(document.getElementById('loc2'));
     var searchBox2 = new google.maps.places.SearchBox(document.getElementById('loc3'));
     
     // Bias the SearchBox results towards current map's viewport.
     map.addListener('bounds_changed', function () {
         searchBox0.setBounds(map.getBounds());
-        searchBox1.setBounds(map.getBounds());    
         searchBox2.setBounds(map.getBounds());
     });
             
     
-    //useful: https://jsonformatter.curiousconcept.com/
     //if searchBox0 is used
     searchBox0.addListener('places_changed', function () {
         document.getElementById("loc1").value = ""; //clear searchbox
@@ -64,32 +72,10 @@ function initMap() {
         document.getElementById("startInfo").innerHTML = "<br>" + start['name']; //shortened name
         document.getElementById("startInfo").title = start['formatted_address'];
         
-        //document.getElementById("startInfo").innerHTML = "<br>" + start['formatted_address'];
         calcRoute();
     });
     
-    //if searchBox1 is used //
-    searchBox1.addListener('places_changed', function () {
-        document.getElementById("loc2").value = "";
-        
-        if(exists(searchBox1.getPlaces()[0], false))
-            return; //don't allow a duplicate place to be added
-        
-        if(wayPoint.length < 8) { //8 waypoints max
-            wayPoint.push(searchBox1.getPlaces()[0]); //add place to end of array
-            var i = wayPoint.length-1;
-            setMarker(i+2, wayPoint[i]);
-            document.getElementById("wayPointsInfo").innerHTML += "<li id='point" + i + "'>" + "<t class='tooltip' title='" + wayPoint[i]['formatted_address'] + "'>" +
-            wayPoint[i]['name'] +
-                "</t><a href='javascript:void(0)' onclick='deletePoint(this)'><img src='images/delete.png' height='10' hspace='10'></a>\
-                <a href='javascript:void(0)'>"; // [X]
-//            console.log("wayPoint=" + wayPoint + '\n');
-            
-            calcRoute();
-        }
-        else
-            alert("Only 8 waypoints are allowed. Please remove a waypoint before adding a new one.");
-    });
+
     
     //if searchBox2 is used
     searchBox2.addListener('places_changed', function () {
@@ -106,19 +92,15 @@ function initMap() {
     
 
     
-    //place the search boxes on the top left of the map
-//    map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('loc1'));
-//    map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('loc2'));
-//    map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('loc3'));
 }
 
 
 function calcRoute(routeStart) {
-    if(typeof start == 'undefined' || typeof end == 'undefined' || typeof wayPoint[0] == 'undefined') {
+    if(typeof start == 'undefined' || typeof end == //'undefined' || typeof wayPoint[0] ==
+     'undefined') {
         var pan = document.getElementById('directionsPanel');
         if((' ' + pan.className + ' ').indexOf(' disabled ') == -1) {
             pan.className += " disabled";
-            document.getElementById("ham").src='images/grey-hamburger.png';
         }
         
         directionsDisplay.setMap(null); //in case the map was previously drawn
@@ -131,7 +113,6 @@ function calcRoute(routeStart) {
     directionsDisplay.setMap(map);
     var actualWaypoints = [];
     for(var i=0; i<wayPoint.length; i++) { //loop through the waypoints (skip start and end places)
-//        console.log("Defining actualWaypoint[" + i + "]");
         actualWaypoints[i] = { //subtract 2 to fill this array starting at [0]
             location: wayPoint[i].geometry.location, //latlng object
             stopover: true
@@ -145,8 +126,8 @@ function calcRoute(routeStart) {
     var request = { //https://developers.google.com/maps/documentation/javascript/directions
         origin: start.geometry.location, //latlng object
         destination: end.geometry.location,
-        waypoints: actualWaypoints,
-        optimizeWaypoints: true, ///VERY IMPORTANT!!! WOW example: tinyurl.com/gmproj6
+        //waypoints: actualWaypoints,
+        //optimizeWaypoints: true, ///VERY IMPORTANT!!! WOW example: tinyurl.com/gmproj6
         travelMode: google.maps.TravelMode.DRIVING
     }
     
@@ -162,9 +143,26 @@ function calcRoute(routeStart) {
             pan.className = ""; //make panel visible
             document.getElementById("ham").src='images/hamburger.png';
         }
-    
-}
+    $(".step1").hide();
+    $("#map").show();
+    $(".music").show();
+    $("#directionsPanel").show();
+    $("#mileFrFb").show();
 
+    setTimeout(function(){
+        var mileage = $('span:eq(0)', '.adp-summary').text();
+        console.log(mileage);
+        database.ref().push({
+            mileage
+            });
+    },1000);
+    
+} 
+
+database.ref().on("child_added", function(snapshot){
+    var fbMileage = snapshot.val().mileage; 
+    $("#mileFrFb").append(fbMileage);
+    });
 
 function setMarker(n, plc) { //sets markers[n] to the latlng object loc, creates a new marker if it doesn't exist
     
@@ -215,8 +213,7 @@ function deletePoint(elem) { //tinyurl.com/gmproj8
         document.getElementById("point" + t).id = "point" + (t-1);
     }
     
-//    console.log("***removed waypoint[" + i + "]");
-//    console.log("wayPoint=" + wayPoint);
+;
     calcRoute();
 }
 
@@ -253,3 +250,9 @@ function exists(plc, isEndpoint) { //place, boolean indicator if this place will
     return false; //working :D!
     
 }
+var newRoute = {
+    startLocation:start,
+    endLocation:end
+}
+console.log(newRoute);
+    database.ref().push(newRoute);
