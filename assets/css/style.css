@@ -1,0 +1,68 @@
+#map {
+    border: 1px solid black;
+    height: 59%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-right: 10px;
+    padding-right: 15px;
+    margin-bottom: 10px;
+    
+}
+
+.hidden, .disabled {
+    display: none;
+}
+
+.on {
+    display: inline;
+}
+
+input {
+    width: 95%; /*90% of #placeInfo's width */
+    
+}
+
+#placeInfo >h3 {
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    
+}
+
+ol {
+    font: 13px/1.4 Helvetica, arial;
+}
+
+ol > li {
+    margin-bottom: 10px;
+}
+
+.tooltip{
+    display: inline;
+    position: relative;
+}
+
+.tooltip:hover:after{
+    background: #333;
+    background: rgba(0,0,0,.8);
+    border-radius: 5px;
+    bottom: 26px;
+    color: #fff;
+    content: attr(title); /*set content to the title of the element*/
+    left: 20%;
+    padding: 5px 15px;
+    position: absolute;
+    z-index: 98;
+    width: 220px;
+}
+
+.tooltip:hover:before{
+    border: solid;
+    border-color: #333 transparent;
+    border-width: 6px 6px 0 6px;
+    bottom: 20px;
+    content: "";
+    left: 50%;
+    position: absolute;
+    z-index: 99;
+}
