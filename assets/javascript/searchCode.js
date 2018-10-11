@@ -1,21 +1,16 @@
-// Initialize Firebase
-var config = {
-  apiKey: "AIzaSyCgdC3L7ERDDqFWDQs1HOKGajC97eStPDo",
-  authDomain: "musicmaps-80439.firebaseapp.com",
-  databaseURL: "https://musicmaps-80439.firebaseio.com",
-  projectId: "musicmaps-80439",
-  storageBucket: "musicmaps-80439.appspot.com",
-  messagingSenderId: "185807662566"
-};
-firebase.initializeApp(config);
+$("#map").hide();
 $(".music").hide();
+$("#directionsPanel").hide();
+$("#mileFrFb").hide();
+
+var database = firebase.database();
 
 var map;
 var markers = []; //store the location markers we add tinyurl.com/gmproj5
 var directionsDisplay;
 var directionsService;
 
-var start ; //start place
+var start; //start place
 var end; //end place
 var wayPoint = []; //array for holding places objects of each travel point. [0] = start, [1] = end, others = waypoints
 
@@ -26,18 +21,7 @@ function initMap() {
         center: {lat: 37.09024, lng: -100.712891}, //initially centered in the middle of the US, quickly replaced with current location
         zoom: 4
     });
-    
-    
-    // attempt to get user location with W3C Geolocation (Preferred). see: tinyurl.com/gmproj3
-    var initialLocation;
-    if(navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            map.setCenter(initialLocation);
-            map.setZoom(17);
-        });
-    }
-    
+
     
     //DIRECTIONS based on directions-panel.html from tinyurl.com/gmproj2
     //automatically updated when a new route is set
@@ -72,6 +56,7 @@ function initMap() {
         document.getElementById("startInfo").innerHTML = "<br>" + start['name']; //shortened name
         document.getElementById("startInfo").title = start['formatted_address'];
         
+        //document.getElementById("startInfo").innerHTML = "<br>" + start['formatted_address'];
         calcRoute();
     });
     
@@ -123,11 +108,10 @@ function calcRoute(routeStart) {
     
     console.log("***calculating route");
     
-    var request = { //https://developers.google.com/maps/documentation/javascript/directions
+    var request = { 
         origin: start.geometry.location, //latlng object
         destination: end.geometry.location,
-        //waypoints: actualWaypoints,
-        //optimizeWaypoints: true, ///VERY IMPORTANT!!! WOW example: tinyurl.com/gmproj6
+        
         travelMode: google.maps.TravelMode.DRIVING
     }
     
@@ -141,7 +125,6 @@ function calcRoute(routeStart) {
     var pan = document.getElementById('directionsPanel');
         if((' ' + pan.className + ' ').indexOf(' disabled ') != -1) {
             pan.className = ""; //make panel visible
-            document.getElementById("ham").src='images/hamburger.png';
         }
     $(".step1").hide();
     $("#map").show();
@@ -161,7 +144,11 @@ function calcRoute(routeStart) {
 
 database.ref().on("child_added", function(snapshot){
     var fbMileage = snapshot.val().mileage; 
-    $("#mileFrFb").append(fbMileage);
+    
+    
+    $("#mileFrFb").prepend("✔");
+    $("#mileFrFb").prepend(fbMileage);
+
     });
 
 function setMarker(n, plc) { //sets markers[n] to the latlng object loc, creates a new marker if it doesn't exist
@@ -213,7 +200,8 @@ function deletePoint(elem) { //tinyurl.com/gmproj8
         document.getElementById("point" + t).id = "point" + (t-1);
     }
     
-;
+//    console.log("***removed waypoint[" + i + "]");
+//    console.log("wayPoint=" + wayPoint);
     calcRoute();
 }
 
@@ -239,7 +227,7 @@ function exists(plc, isEndpoint) { //place, boolean indicator if this place will
         if(wayPoint[i]['formatted_address'] == plc['formatted_address']) {
             alert("Address:\n" + "'" + wayPoint[i]['formatted_address'] + "'\nis already a waypoint!\n");
             return true;
-           }
+           } 
     }
     
     //check that the potential waypoint isn't the same as the start or end
@@ -250,9 +238,7 @@ function exists(plc, isEndpoint) { //place, boolean indicator if this place will
     return false; //working :D!
     
 }
-var newRoute = {
-    startLocation:start,
-    endLocation:end
-}
-console.log(newRoute);
-    database.ref().push(newRoute);
+
+// var mileage = setTimeout(function(){console.log($('span:eq(0)', '.adp-summary').text());},10000);
+
+
