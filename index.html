@@ -9,15 +9,25 @@
   src="https://code.jquery.com/jquery-3.3.1.js"
   integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
   crossorigin="anonymous"></script>
+
   <script src="https://www.gstatic.com/firebasejs/5.5.3/firebase.js"></script>
-
-
-    
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCgdC3L7ERDDqFWDQs1HOKGajC97eStPDo",
+      authDomain: "musicmaps-80439.firebaseapp.com",
+      databaseURL: "https://musicmaps-80439.firebaseio.com",
+      projectId: "musicmaps-80439",
+      storageBucket: "musicmaps-80439.appspot.com",
+      messagingSenderId: "185807662566"
+    };
+    firebase.initializeApp(config);
+  </script>
 
   </head>
     
     
-  <body>
+  <body style="background-image: url('./assets/images/background.png')">
 
         <div class="container">
         <div class="card text-white bg-dark m-2">
@@ -33,7 +43,12 @@
                         <h1>Have a safe ride!</h1>
                         <!--Needs to change to an injectible iframe playlist based on mileage distance returned from the route.-->
                         <iframe src="https://open.spotify.com/embed/user/spotify/playlist/37i9dQZF1DX0XUsuxWHRQd" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-                        </div>
+                    </div>
+                        
+                        <h1 id="mileFrFb"></h1>
+                    
+
+                        
 
             <h1 class="step1">Calculate a Route</h1> 
       
@@ -42,10 +57,8 @@
                     <h3 style="color: blue;">Instructions:</h3>
                         <ol>
                             <li>Enter the start location in the "Start" search box</li>
-                            <li>Enter up to 8 waypoint locations in the "Waypoints" box in any order</li>
                             <li>Enter the end location in the "End" box</li>
-                            <li>Mouseover a location on the left panel to view its address</li>
-                            <li>Delete waypoints with the red x; change start/end by entering a new location</li>
+                            <li>Click anywhere in the directions tab to for more detail</li>
                         </ol>
                 </div>
             
@@ -65,12 +78,15 @@
             </div>
       
     <div class="row">
-    <div id="directionsPanel" class="col-6 m-0"></div><!--Floats must be above non floats (the map) tinyurl.com/gmproj13-->
+    <div id="directionsPanel" class="col-6 m-0 card"></div><!--Floats must be above non floats (the map) tinyurl.com/gmproj13-->
         
     <div id="map" class="col-6 m-0"></div> <!--where the map is rendered-->  
 </div>
 </div>
-            
+      
+      
+      <script src="searchCode.js"></script>
+      
       <!--added my api key here and "&libraries=places" which imports the places library-->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB04Iha4MnlTVAvjGXQ_9vlQoH-ZTijq4U&callback=initMap&libraries=places" async defer></script>
       
